@@ -7,12 +7,30 @@ import java.util.Date;
 import br.vinicius.kegler.entities.Movie;
 import br.vinicius.kegler.entities.Rental;
 import br.vinicius.kegler.entities.User;
-import br.vinicius.kegler.utils.DateUtils;
+import br.vinicius.kegler.exceptions.RentalException;
 
 public class RentalService {
 	
-	public Rental rentMovie(User user, Movie movie) {
+	
+	
+	public Rental rentMovie(User user, Movie movie) throws RentalException {
 		Rental rental = new Rental();
+		if(movie == null) {
+			throw  new RentalException("No movie selected!");
+		}
+
+		if(movie.getStock() == 0) {
+			throw new RentalException(movie.getName() + " is out of stock.");
+		}
+		
+		if(user == null) {
+			throw new RentalException("No user selected!");
+		}
+		
+		if(user.getName() == null || user.getName().isEmpty()) {
+			throw new RentalException("User name is empty");
+		}
+		
 		rental.setMovie(movie);
 		rental.setUser(user);
 		rental.setRentDate(new Date());
@@ -27,20 +45,5 @@ public class RentalService {
 		//TODO 
 		
 		return rental;
-	}
-
-	public static void main(String[] args) {
-		RentalService ls = new RentalService();
-		User user = new User("Teste");
-		Movie movie = new Movie("Teste", 10, 25.0);
-		
-		Rental rent = ls.rentMovie(user, movie);
-		
-		System.out.println(rent.getRentPrice() == 25 ? "Valid rent price." : "Invalid rent price.");
-		
-		System.out.println(DateUtils.isSameDate(rent.getRentDate(), new Date()) ? "Valid rent date." : "Invalid rent date.");
-		
-		System.out.println(DateUtils.isSameDate(rent.getReturnDate(), DateUtils.getDateWithDaysDifference(1)) ? "Valid return date." : "Invalid return date.");
-	
 	}
 }
